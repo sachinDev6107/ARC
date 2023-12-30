@@ -1,0 +1,28 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "student-registration-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/studentRegistration/StudentRegistrationWebPart.js",
+          "manifest": "./src/webparts/studentRegistration/StudentRegistrationWebPart.manifest.json"
+        }
+      ]
+    },
+    "dashboard-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/dashboard/DashboardWebPart.js",
+          "manifest": "./src/webparts/dashboard/DashboardWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "StudentRegistrationWebPartStrings": "lib/webparts/studentRegistration/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
+    "DashboardWebPartStrings": "lib/webparts/dashboard/loc/{locale}.js"
+  }
+}
