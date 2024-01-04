@@ -8,6 +8,7 @@ export interface IEMIInfodProps {
     emiInfoData:EMIInfoFormValues;
     basicInfoData:BasicInfoFormValues;
     context:WebPartContext;
+    isFirstPaymentDone:boolean;
 }
 
 export interface IEMIInfoState {

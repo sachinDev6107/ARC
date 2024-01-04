@@ -136,7 +136,7 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
                     id='ddlCategorySelect'
                     placeholder='Select Course Category'
                     multiSelect
-                    disabled={this.state.formValues.isCourseInfoSaved}
+                    disabled={this.state.formValues.isCourseInfoSaved && this.props.isFirstPaymentDone}
                     //selectedKeys={this.state.formValues.selectedCourseCategories.length?this.state.formValues.selectedCourseCategories:undefined}
                     options={this.props.courseCategoryOption}
                     defaultSelectedKeys={this.state.formValues.selectedCourseCategories}
@@ -164,7 +164,7 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
                               <Checkbox
                                 label={`${crItem.Title} - (${crItem.Category.results.join(', ')}) - ₹${crItem.Fees}`}
                                 checked={crItem.IsSelectedCourse}
-                                disabled={this.state.formValues.isCourseInfoSaved}
+                                disabled={this.state.formValues.isCourseInfoSaved && this.props.isFirstPaymentDone}
                                 onChange={(ev: any, checked: boolean) => {
                                   crItem.IsSelectedCourse = checked;
                                   this.setState({
@@ -197,7 +197,7 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
             </Card.Body>
             </Card>
             {
-              !this.state.formValues.isCourseInfoSaved && 
+              (!this.state.formValues.isCourseInfoSaved || !this.props.isFirstPaymentDone) &&
                 <Row>
                   <Col className="mt-2 mb-3 text-center">
                       <PrimaryButton

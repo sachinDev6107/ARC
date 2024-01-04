@@ -4,12 +4,14 @@ import { CourseInfoFormValues } from "../CourseInfo/ICourseInfo";
 import { EMIInfoFormValues } from "../EMIInfo/IEMIInfo";
 import { TransactionDataFormValues } from "../FeesTransactions/ITransactionsInfo";
 import { DigitalPaymentReceipt } from "../DigitalPaymentReceipt";
+import { WebPartContext } from "@microsoft/sp-webpart-base";
 
 export interface IFinalValidationdProps {
     courseInfo:CourseInfoFormValues;
     emiInfoData:EMIInfoFormValues;
     basicInfoData:BasicInfoFormValues;
     transactionInfoData:TransactionDataFormValues[];
+    context:WebPartContext
 }
 
 export interface IFinalValidationdState {
@@ -36,6 +38,7 @@ class FinalValidation extends React.Component<IFinalValidationdProps, IFinalVali
                     emiInfoData={this.props.emiInfoData}
                     basicInfoData={this.props.basicInfoData}
                     transactionInfoData={this.props.transactionInfoData}
+                    siteUrl={this.props.context.pageContext.web.absoluteUrl}
               ></DigitalPaymentReceipt>  
             </>
         );

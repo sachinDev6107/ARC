@@ -16,6 +16,7 @@ interface IDigitalPaymentReceiptProps
     emiInfoData:EMIInfoFormValues;
     basicInfoData:BasicInfoFormValues;
     transactionInfoData:TransactionDataFormValues[];
+    siteUrl:string;
 }
 
 export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceiptProps,any>
@@ -35,7 +36,7 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
         const img = new Image();
         const imgWidth = pageWidth;
         //const imgHeight = (img.height * pageWidth) / img.width;
-        img.src = "https://arcinstitutions.sharepoint.com/sites/ARCPune/SiteAssets/Letter%20Head.png";
+        img.src = this.props.siteUrl+"/SiteAssets/Letter%20Head.png";
         printDoc.addImage(img,'PNG',0,0,imgWidth,pageHeight)
 
 
@@ -140,9 +141,6 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
             theme: 'striped', // 'striped', 'grid', or 'plain'
             styles: { overflow: 'linebreak' },
           });
-
-    
-    
 
         printDoc = this.addWaterMark(printDoc);
         printDoc.save("Export.pdf");

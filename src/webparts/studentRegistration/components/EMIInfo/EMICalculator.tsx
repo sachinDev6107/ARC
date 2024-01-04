@@ -116,9 +116,14 @@ export default class EMICalculator extends React.Component<
         }
       }
 
-      this.setState({ emiData, noOfEMIs: numberOfMonths,notFormValid:false });
-      this.props.updateFeesPaid(this.state.initialAmount);
-      this.props.UpdateEMIData(this.state.emiData);
+      this.setState({ 
+        emiData:emiData, 
+        noOfEMIs: numberOfMonths,
+        notFormValid:false 
+      },() => {
+        this.props.updateFeesPaid(this.state.initialAmount);
+        this.props.UpdateEMIData(this.state.emiData);
+      });
     }
     else {
       this.setState({ notFormValid: true })
@@ -178,7 +183,7 @@ export default class EMICalculator extends React.Component<
           <Col xs={4} md={4}>
             <Label required>How much initial amount do you want to pay?</Label>
             <TextField
-              value={this.state.initialAmount.toString()}
+              value={this.state.initialAmount?.toString()}
               defaultValue=""
               onChange={(ev: any) => {
                 this.setState({ initialAmount: ev.target.value })

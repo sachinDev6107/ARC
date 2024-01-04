@@ -263,6 +263,7 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
                       courseCategoryOption={this.state.courseCategoryOption}
                       context={this.props.context}
                       spStudentId={this.state.spStudentId}
+                      isFirstPaymentDone={this.state.emiInfoData.isInitialAmountPaymentDone}
                     />
                   </CourseInfoCtx.Provider>
                 ),
@@ -276,7 +277,8 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
                     courseInfoData={this.state.courseInfoData}
                     updateEMIInfoCtx={this.updateEMIInfoCtx}
                     emiInfoData={this.state.emiInfoData} context={this.props.context} 
-                    basicInfoData={this.state.basicInfoData}                    
+                    basicInfoData={this.state.basicInfoData}
+                    isFirstPaymentDone={this.state.emiInfoData.isInitialAmountPaymentDone}                    
                   />
                 ),
               },
@@ -292,6 +294,7 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
                     transactionInfoData={this.state.transactionInfoData}
                     modeOfPaymentOptions={this.state.modeOfPaymentsOptions}
                     updateTransactionInfoCtx={this.updateTransactionInfoCtx}
+                    updateBasicInfoCtx={this.updateBasicInfoCtx}
                     context={this.props.context}
                     updateEMIInfoCtx={this.updateEMIInfoCtx}
                   />
@@ -307,6 +310,7 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
                     emiInfoData={this.state.emiInfoData}
                     basicInfoData={this.state.basicInfoData}
                     transactionInfoData={this.state.transactionInfoData}
+                    context={this.props.context}
                   ></FinalValidation>
                 ),
               },

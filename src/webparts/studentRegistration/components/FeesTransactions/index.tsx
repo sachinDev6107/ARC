@@ -22,7 +22,7 @@ import { BasicInfoCtx } from "../ComponentContext/Contexts";
 class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTransactionsState> {
   spListService = new SPListService(this.props.context.pageContext.web.absoluteUrl);
   saveRegistrationObj:SaveRegistrationFormValue = new SaveRegistrationFormValue(this.props.context.pageContext.web.absoluteUrl);
-  basicInfoCtx:React.ContextType<typeof BasicInfoCtx>;
+  context:React.ContextType<typeof BasicInfoCtx>;
   dueEMIs:any[] = [];
   constructor(props: IFeesTransactionsProps) {
     super(props);
@@ -30,7 +30,7 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
       transactionsData: [
         {
           paidAmount: props.emiInfoData.feesPaid,
-          paymentDate: '',
+          paymentDate: moment(new Date()).format('MM/DD/YYYY'),
           paymentReceiptNo: '',
           transactionNo: '',
           modeOfPayment: '',
@@ -65,7 +65,7 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
     const { transactionsData } = this.state;
     transactionsData.push({
       paidAmount: 0,
-      paymentDate: '',
+      paymentDate: moment(new Date()).format('MM/DD/YYYY'),
       paymentReceiptNo: '',
       transactionNo: '',
       modeOfPayment: '',
@@ -183,9 +183,9 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
 
       let totalTransAmt = 0; 
       this.state.transactionsData.forEach(item=>{
-        totalTransAmt += item.paidAmount;
+        totalTransAmt += parseInt(item.paidAmount.toString());
       })
-      if(totalTransAmt>this.props.emiInfoData.initialAmount && !this.props.emiInfoData.isInitialAmountPaymentDone)
+      if(totalTransAmt>this.props.emiInfoData.feesPaid && !this.props.emiInfoData.isInitialAmountPaymentDone)
       {
           this.setState({
             notSavedValid:true,
@@ -244,7 +244,7 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
                   emiInfoData.isInitialAmountPaymentDone = true;
                   this.props.updateEMIInfoCtx(emiInfoData);
 
-                  this.basicInfoCtx.updateBasicInfoCtx({...this.props.basicInfoData,feesStatus:stuUpdateMetaData.FeesStatus})
+                  this.props.updateBasicInfoCtx({...this.props.basicInfoData,feesStatus:stuUpdateMetaData.FeesStatus})
                   this.props.updateEMIInfoCtx({...this.props.emiInfoData,feesPaid:stuUpdateMetaData.FeesPaid,totalRemainingAmount:stuUpdateMetaData.RemainingFees})
                 }
                 else
@@ -255,7 +255,7 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
                     FeesStatus:totalTransAmt>=this.props.courseInfo.totalFees?"Completed":"Pending"
                   }
                   await this.spListService.UpdateListItemByID(this.props.basicInfoData.spStudentId,stuUpdateMetaData,"StudentRegistrations");
-                  this.basicInfoCtx.updateBasicInfoCtx({...this.props.basicInfoData,feesStatus:stuUpdateMetaData.FeesStatus})
+                  this.props.updateBasicInfoCtx({...this.props.basicInfoData,feesStatus:stuUpdateMetaData.FeesStatus})
                   this.props.updateEMIInfoCtx({...this.props.emiInfoData,feesPaid:stuUpdateMetaData.FeesPaid,totalRemainingAmount:stuUpdateMetaData.RemainingFees})
                 }
                 this.setState({})
@@ -312,15 +312,29 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
           </Col>
           <Col className="xs={12} md={3}">
               <Label>Paid Fees:</Label>
-              <span>₹{this.props.emiInfoData.feesPaid}</span>
+              {
+                !this.props.emiInfoData.isInitialAmountPaymentDone?
+                <span>₹{0}</span>:
+                <span>₹{this.props.emiInfoData.feesPaid}</span>
+              }
+              
           </Col>
           <Col className="xs={12} md={3}">
               <Label>Remaining Fees:</Label>
-              <span>₹{this.props.emiInfoData.totalRemainingAmount}</span>
+              {
+                !this.props.emiInfoData.isInitialAmountPaymentDone?
+                <span>₹{this.props.courseInfo.totalFees}</span>:
+                <span>₹{this.props.emiInfoData.totalRemainingAmount}</span>
+              }
           </Col>
           <Col className="xs={12} md={3}">
               <Label>Fees Status:</Label>
-              <span style={{backgroundColor:"green"}}>{this.props.basicInfoData.feesStatus}</span>
+              {
+                this.props.basicInfoData.feesStatus==="" || this.props.basicInfoData.feesStatus==="Pending"?
+                <span style={{backgroundColor:"red"}}>Pending</span>:
+                <span style={{backgroundColor:"green"}}>{this.props.basicInfoData.feesStatus}</span>
+              }
+              
           </Col>
         </Row>
         <Card className='mb-4 mt-4'>
@@ -481,7 +495,7 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
         </Row>
         <Row>
           {
-              this.props.basicInfoData.feesStatus=="Pending" && 
+              (this.props.basicInfoData.feesStatus=="Pending" || this.props.basicInfoData.feesStatus=="") && 
               <Col className="mt-2 mb-3 text-center">
                 <PrimaryButton
                   iconProps={{ iconName: 'Save' }}

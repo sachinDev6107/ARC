@@ -52,6 +52,7 @@ class EMIInfo extends React.Component<IEMIInfodProps, IEMIInfoState> {
     {
       if(this._isValid())
       {
+        this.spListService = new SPListService(this.props.context.pageContext.web.absoluteUrl);
         let emiCalState = this.emiCalculatorRef.current?.state;
         let emiMetaData = {
           FeesPaid:this.state.formValues.feesPaid,
@@ -65,12 +66,7 @@ class EMIInfo extends React.Component<IEMIInfodProps, IEMIInfoState> {
         await this.spListService.UpdateListItemByID(this.props.basicInfoData.spStudentId,emiMetaData,"StudentRegistrations");
         
         let spEmiItems = await this.spListService.GetListItems('EMIMaster','Id,StudentItemId/Id',`StudentItemId/Id eq ${this.props.basicInfoData.spStudentId}`,'StudentItemId/Id');
-        if(spEmiItems.length)
-        {
-          spEmiItems.forEach((emiItem:any) => {
-              this.spListService.DeleteListItemByID('EMIMaster',emiItem.Id);
-            });
-        }
+        
 
         let emiItems: any[] = [];
         this.state.formValues.emiData.forEach(emiRec=>{
@@ -101,6 +97,12 @@ class EMIInfo extends React.Component<IEMIInfodProps, IEMIInfoState> {
         },()=>{
           this.props.updateEMIInfoCtx(this.state.formValues)
         })
+        if(spEmiItems.length)
+        {
+          spEmiItems.forEach(async (emiItem:any) => {
+              await this.spListService.DeleteListItemByID('EMIMaster',emiItem.Id);
+            });
+        }
       }
       else
       {
@@ -142,7 +144,7 @@ class EMIInfo extends React.Component<IEMIInfodProps, IEMIInfoState> {
                 <Col xs={12} md={4} className='pt-2'>
                   <Checkbox
                     label='Do you want to pay in EMI?'
-                    disabled={this.state.formValues.isEMIInfoSaved}
+                    disabled={this.state.formValues.isEMIInfoSaved && this.props.isFirstPaymentDone}
                     checked={this.state.formValues.isPayInEMI}
                     boxSide="end"
                     onChange={(ev: any, checked: boolean) => {
@@ -170,7 +172,7 @@ class EMIInfo extends React.Component<IEMIInfodProps, IEMIInfoState> {
                 <Col xs={12} md={4}>
                   <Label>Fees Paid</Label>
                   <TextField type="Number" id="fPaid" 
-                    disabled={this.state.formValues.isEMIInfoSaved}
+                    disabled={this.state.formValues.isEMIInfoSaved && this.props.isFirstPaymentDone}
                     value={this.state.formValues.feesPaid?.toString()} 
                     onChange={(ev:any)=>{this.setState({ formValues:{
                       ...this.state.formValues,feesPaid:ev.target.value}})}}
@@ -210,7 +212,7 @@ class EMIInfo extends React.Component<IEMIInfodProps, IEMIInfoState> {
             </Card.Body>
             </Card>
             {
-              !this.state.formValues.isEMIInfoSaved && 
+              (!this.state.formValues.isEMIInfoSaved || !this.props.isFirstPaymentDone) &&
                 <Row>  
                   <Col className="mt-2 mb-3 text-center">
                       <PrimaryButton

@@ -12,6 +12,7 @@ export interface IFeesTransactionsProps {
     context:WebPartContext;
     updateTransactionInfoCtx:any;
     updateEMIInfoCtx:any;
+    updateBasicInfoCtx:any;
   }
 
   export interface ITransactionData {

@@ -13,6 +13,7 @@ export interface ICourseInfodProps {
     courseCategoryOption:any[];
     context:WebPartContext;
     spStudentId:number;
+    isFirstPaymentDone:boolean;
 }
 
 export interface ICourseInfodState {
