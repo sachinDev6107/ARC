@@ -7,6 +7,8 @@ export class CourseInfoFormValues
     courseDuration:number=0;
     spSelectedCourseItems:any=[];
     isCourseInfoSaved:boolean=false;
+    courseDiscount:number=0;
+    actualCourseFees:number=0;
 }
 
 export interface ICourseInfodProps {

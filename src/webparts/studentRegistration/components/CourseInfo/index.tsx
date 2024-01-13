@@ -1,13 +1,14 @@
 
 //import scss from './index.scss';
 
-import { Label, Dropdown, Checkbox, IDropdownOption, PrimaryButton } from "office-ui-fabric-react";
+import { Label, Dropdown, Checkbox, IDropdownOption, PrimaryButton, TextField } from "office-ui-fabric-react";
 import * as React from "react";
 import { Card, Row, Col } from "react-bootstrap";
 import SPListService from "../../../../Services/SPListService";
 import { CourseInfoFormValues, ICourseInfodProps, ICourseInfodState } from "./ICourseInfo";
 import { CourseInfoCtx } from "../ComponentContext/Contexts";
 import { SaveRegistrationFormValue } from "../Save";
+import { ValidationService } from "../../../../Services/ValidationService";
 
 
 class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
@@ -15,6 +16,7 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
     saveRegistrationObj:SaveRegistrationFormValue = new SaveRegistrationFormValue(this.props.context.pageContext.web.absoluteUrl);
     context:React.ContextType<typeof CourseInfoCtx>;
     catDpKey = 0;
+    validationSerive = new ValidationService();
     constructor(props:ICourseInfodProps) {
         super(props);
         this.state = {
@@ -28,10 +30,25 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
       {
           this.setState({
               formValues:{...this.context.courseInfoData}
-          })
+          },this.calculateActualCourseFees)
+          
       }
       this.catDpKey = Math.random();
     }
+
+    calculateActualCourseFees = () => {
+        let actualCourseFees = 0;
+        this.state.formValues.spSelectedCourseItems.forEach((item:any) => {
+          actualCourseFees += item.Fees
+        })
+        this.setState({
+          formValues:{
+            ...this.state.formValues,
+            actualCourseFees:actualCourseFees
+          }
+        })
+    }
+
 
     private _dropdownCategoryChange = async (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number) => {
       let tempSelectedCourseCat = this.state.formValues.selectedCourseCategories;
@@ -81,6 +98,7 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
               ...this.state.formValues,
               spSelectedCourseItems:spCategoryCourses,
               totalFees:totFees,
+              actualCourseFees:totFees,
               courseDuration:totDays
             }
           })
@@ -169,10 +187,11 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
                                   crItem.IsSelectedCourse = checked;
                                   this.setState({
                                       formValues:{
-                                      ...this.state.formValues,
-                                      selectedCourseCategories: this.state.formValues.selectedCourseCategories,
-                                      totalFees: checked ? this.state.formValues.totalFees + crItem.Fees : this.state.formValues.totalFees - crItem.Fees,
-                                      courseDuration: checked ? this.state.formValues.courseDuration + crItem.Duration : this.state.formValues.courseDuration - crItem.Duration
+                                        ...this.state.formValues,
+                                        selectedCourseCategories: this.state.formValues.selectedCourseCategories,
+                                        totalFees: checked ? this.state.formValues.totalFees + crItem.Fees : this.state.formValues.totalFees - crItem.Fees,
+                                        actualCourseFees: checked? this.state.formValues.actualCourseFees + crItem.Fees : this.state.formValues.actualCourseFees - crItem.Fees,
+                                        courseDuration: checked ? this.state.formValues.courseDuration + crItem.Duration : this.state.formValues.courseDuration - crItem.Duration
                                       }
                                   })
                                 }}
@@ -185,7 +204,7 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
                   </Row>
                 </Col>
                 <Col xs={6} md={6} className='text-center'>
-                  <Label>{`Total selected course fees : ${this.state.formValues.totalFees}`}</Label>
+                  <Label>{`Total selected course fees : ${this.state.formValues.actualCourseFees}`}</Label>
                 </Col>
 
                 <Col xs={6} md={6} className='text-center'>
@@ -196,6 +215,36 @@ class CourseInfo extends React.Component<ICourseInfodProps, ICourseInfodState> {
               
             </Card.Body>
             </Card>
+            <Card>
+                <Card.Header>Discount Info</Card.Header>
+                <Card.Body>
+                  <Row>
+                    <Col xs={12} md={6}>
+                      <Label>Discount</Label>
+                      <TextField type="Number" id="dFees" 
+                        onChange={(ev:any)=>{
+                          this.setState({ formValues:{
+                          ...this.state.formValues,
+                          courseDiscount:ev.target.value!=''?parseInt(ev.target.value) : ev.target.value,
+                          totalFees:Math.ceil(this.state.formValues.actualCourseFees-((this.state.formValues.actualCourseFees*(ev.target.value!=''?parseInt(ev.target.value):0))/100))
+                        }
+                        })}}
+                        value={this.state.formValues.courseDiscount?.toString()} 
+                        //errorMessage={this.state.notFormValid && this.validationSerive.isNumberFieldEmpty(this.state.formValues.courseDiscount)?'Discount ':''}
+                        disabled={this.state.formValues.isCourseInfoSaved && this.props.isFirstPaymentDone}
+                      />
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <Label>Fees After Discount</Label>
+                      <TextField type="Number" disabled id="tdFees" 
+                        value={this.state.formValues.totalFees?.toString()} 
+                      />
+                    </Col>
+                  </Row>
+                </Card.Body>
+            </Card>
+
+
             {
               (!this.state.formValues.isCourseInfoSaved || !this.props.isFirstPaymentDone) &&
                 <Row>

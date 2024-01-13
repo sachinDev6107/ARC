@@ -4,7 +4,6 @@ import { BasicInfoFormValues } from "./BasicInfo/IBasicInfo";
 import { CourseInfoFormValues } from "./CourseInfo/ICourseInfo";
 import { EMIInfoFormValues } from "./EMIInfo/IEMIInfo";
 import { TransactionDataFormValues } from "./FeesTransactions/ITransactionsInfo";
-
 import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
 import * as moment from "moment";
@@ -117,9 +116,9 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
             let emiRow = [];
             emiRow.push(emiItem.srNo);
             emiRow.push(emiItem.nextEmiDate);
-            emiRow.push(emiItem.emiAmount);
-            emiRow.push(emiItem.remainingAmount);
-            emiRow.push(emiItem.totalPaidAmount);
+            emiRow.push(Math.ceil(emiItem.emiAmount));
+            emiRow.push(Math.ceil(emiItem.remainingAmount));
+            emiRow.push(Math.ceil(emiItem.totalPaidAmount));
             emiRow.push(emiItem.isEMIPaid?"Paid":"Pending");
             emiTblData.push(emiRow);
         })
@@ -143,7 +142,7 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
           });
 
         printDoc = this.addWaterMark(printDoc);
-        printDoc.save("Export.pdf");
+        printDoc.save(`${this.props.basicInfoData.StudentId}_FeesReceipt_${moment(todaydateValue).format("DDMMMyyyy")}".pdf`);
     }
 
     public addWaterMark(doc:any) { // To add watermark for pdf document
@@ -159,6 +158,7 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
           //doc.text(150, doc.internal.pageSize.height - 500, 'Internal Use Only', 20, 90);
           //doc.text(20, doc.internal.pageSize.height - 10, 'Internal Use Only');
           doc.text(doc.internal.pageSize.width-450, 15, 'ARC Digital Receipt.');
+          doc.text(doc.internal.pageSize.width-450, doc.internal.pageSize.height-100, 'Note : fee once paid will not be refundable under any circumstances.');
         }
     
         return doc;

@@ -299,6 +299,17 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
     }
   }
 
+  private deleteReceipt = async (file:any,rowIndex:number) => {
+    const updatedTransactionsData = [...this.state.transactionsData];
+    await this.spListService.DeleteFileByFilePath(file.fileUrl.substring(0, file.fileUrl.lastIndexOf("/")),file.fileName);
+    const notDeletedFiles = updatedTransactionsData[rowIndex].uploadedPaymentDocuments.filter(item => item.fileName!==file.fileName);
+    updatedTransactionsData[rowIndex].uploadedPaymentDocuments = notDeletedFiles;
+    updatedTransactionsData[rowIndex].paymentReceipt = null
+    this.setState({
+      transactionsData:[...updatedTransactionsData],
+    })
+  }
+
   renderTable() {
     const { transactionsData, validationErrors, showSuccessMessage } = this.state;
     const { modeOfPaymentOptions } = this.props;
@@ -423,19 +434,24 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
                             this.handleAttachmentChange(index, file);
                           }}
                           disabled={transaction.spPaymentId>0?true:false}
+                          //value={transaction.uploadedPaymentDocuments.length>0?transaction.uploadedPaymentDocuments[0].fileName:''}
                         />
                         {validationErrors[`paymentReceipt${index}`] && (
                           <div className="error-message">{validationErrors[`paymentReceipt${index}`]}</div>
                         )}
                         {
+                          transaction.uploadedPaymentDocuments.length > 0?
                           transaction.uploadedPaymentDocuments.map(uploadedFiles=>{
                             return (
                               <div>
                                 <span>{uploadedFiles.fileName}</span>
-                                <IconButton iconProps={{ iconName: 'Cancel' }} title="Delete" ariaLabel="Delete" />
+                                <IconButton 
+                                  disabled={transaction.spPaymentId>0?true:false} 
+                                  iconProps={{ iconName: 'Cancel' }} title="Delete" ariaLabel="Delete" 
+                                  onClick={()=>{this.deleteReceipt(uploadedFiles,index)}} />
                               </div>
                             )
-                          })
+                          }):<div><span>No file uploaded</span></div>
                         }
                       </td>
                       <td> 

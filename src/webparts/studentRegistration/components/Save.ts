@@ -60,15 +60,24 @@ export class SaveRegistrationFormValue {
     }
 
     public async saveCourseInfo(formValues: CourseInfoFormValues, itemId: number, courseDuration: string) {
-        let selectedCourse = formValues.spSelectedCourseItems.map((item:any) => item.Id)
+        let selectedCourse = formValues.spSelectedCourseItems.map((item:any) =>{if(item.IsSelectedCourse){return item.Id}})
+        selectedCourse = selectedCourse.filter(function( element:any ) {
+            return element !== undefined;
+         });
+        let totFees = formValues.actualCourseFees;
+        if(formValues.courseDiscount>0)
+        {
+            totFees = (formValues.actualCourseFees-(formValues.actualCourseFees*(formValues.courseDiscount/100)))
+        }
         let items: any = {
             [ListFieldsStudentRegistration.Courses + "Id"]: {
                 results: selectedCourse
             },
-            [ListFieldsStudentRegistration.TotalFees]: formValues.totalFees,
+            [ListFieldsStudentRegistration.TotalFees]: Math.ceil(totFees),
             [ListFieldsStudentRegistration.CourseDuration]: courseDuration,
             "CourseDurationInMonths":formValues.courseDuration,
-            "CourseCategories":formValues.selectedCourseCategories.join(',')
+            "CourseCategories":formValues.selectedCourseCategories.join(','),
+            "Discount":formValues.courseDiscount,
         }
         const saveCourseResult = await this.spListService.UpdateListItemByID(itemId, items, ListNames.StudentRegistrations);
         return saveCourseResult;

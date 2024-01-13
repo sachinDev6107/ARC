@@ -108,9 +108,9 @@ export default class EMICalculator extends React.Component<
           emiData.push({
             srNo: i,
             nextEmiDate: nextEmiDate.toDateString(),
-            emiAmount: currentEmiAmount,
-            remainingAmount: remainingAmount,
-            totalPaidAmount: totalPaidAmount, // Add totalPaidAmount to the table,
+            emiAmount: Math.ceil(currentEmiAmount),
+            remainingAmount: Math.ceil(remainingAmount),
+            totalPaidAmount: Math.ceil(totalPaidAmount), // Add totalPaidAmount to the table,
             isEMIPaid:false
           });
         }

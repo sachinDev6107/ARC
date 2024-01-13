@@ -98,6 +98,7 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
         let spCourseInfo = new CourseInfoFormValues();
         spCourseInfo.courseDuration = spStuRegData["CourseDurationInMonths"];
         spCourseInfo.totalFees = spStuRegData["TotalFees"];
+        spCourseInfo.courseDiscount = spStuRegData["Discount"];
 
         let courseCat:any = [];
         let selectedCourseIds = "";
