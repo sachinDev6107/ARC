@@ -1,5 +1,5 @@
 //import scss from './index.scss';
-import { Label, TextField, DatePicker, Dropdown, IDropdownOption, PrimaryButton } from 'office-ui-fabric-react';
+import { Label, TextField, DatePicker, Dropdown, IDropdownOption, PrimaryButton, IDatePickerStrings } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
 import { BasicInfoFormValues, IBasicInfoState } from './IBasicInfo';
@@ -207,10 +207,12 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
                                     !this.state.formValues.spStudentId && 
                                     <DatePicker
                                         id="ddldob"
-                                        placeholder='Select the Date'
+                                        placeholder='Select the Date (DD-MM-YYYY) Ex: 01-jan-2007'
                                         value={this.state.formValues.DateOfBirth}
                                         onSelectDate={this.DateofBirthChange}
-                                        
+                                        allowTextInput={true}
+                                        formatDate={formatDate}
+                                        strings={DayPickerStrings}
                                     >
                                     </DatePicker>
                                 }
@@ -310,5 +312,43 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
         );
     }
 }
+
+const formatDate = (date?: Date): string => {
+    if (!date) return '';
+    const month = date.getMonth() + 1; // + 1 because 0 indicates the first Month of the Year.
+    const day = date.getDate();
+    const year = date.getFullYear();
+  
+    return `${day}-${month}-${year}`;
+}
+const DayPickerStrings: IDatePickerStrings = {
+    months: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ],
+  
+    shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  
+    days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  
+    shortDays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+  
+    goToToday: 'Go to today',
+    prevMonthAriaLabel: 'Go to previous month',
+    nextMonthAriaLabel: 'Go to next month',
+    prevYearAriaLabel: 'Go to previous year',
+    nextYearAriaLabel: 'Go to next year'
+  };
+
 BasicInfo.contextType = BasicInfoCtx
 export default BasicInfo;
