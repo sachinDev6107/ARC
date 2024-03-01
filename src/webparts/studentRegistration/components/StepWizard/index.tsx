@@ -86,6 +86,7 @@ function StepWizard(props:any) {
             text='Next'
             onClick={handleNext}
             disabled={activeStep.isDone?false:true}
+            //disabled={activeStep.isDone?true:false}
             iconProps={{iconName:'DoubleChevronRight8'}}
           ></PrimaryButton>
           {/* <input type="button" value="Back" onClick={handleBack} disabled={steps[0].key === activeStep.key} /> */}

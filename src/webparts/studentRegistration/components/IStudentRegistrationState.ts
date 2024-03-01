@@ -62,5 +62,7 @@ export interface IStudentRegistrationState{
     registrationConfirmModal:boolean;
     modeOfPaymentsOptions:IDropdownOption[];
     spStudentId:number;
-    isLoading:boolean
+    isLoading:boolean;
+    batchOption:IDropdownOption[];
+    monthOption:IDropdownOption[];
 }

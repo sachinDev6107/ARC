@@ -45,6 +45,7 @@ export interface IEMICalculatorState {
 
 export class EMIInfoFormValues implements IEMICalculatorState
 {
+    spStudentId:number=0;
     initialAmountPaymentDate: Date;
     isInitialAmountPaymentDone: boolean=false;
     notFormValid?: boolean | undefined;

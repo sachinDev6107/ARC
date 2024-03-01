@@ -60,10 +60,10 @@ export class SaveRegistrationFormValue {
     }
 
     public async saveCourseInfo(formValues: CourseInfoFormValues, itemId: number, courseDuration: string) {
-        let selectedCourse = formValues.spSelectedCourseItems.map((item:any) =>{if(item.IsSelectedCourse){return item.Id}})
-        selectedCourse = selectedCourse.filter(function( element:any ) {
-            return element !== undefined;
-         });
+        // let selectedCourse = formValues.spSelectedCourseItems.map((item:any) =>{if(item.IsSelectedCourse){return item.Id}})
+        // selectedCourse = selectedCourse.filter(function( element:any ) {
+        //     return element !== undefined;
+        //  });
         let totFees = formValues.actualCourseFees;
         if(formValues.courseDiscount>0)
         {
@@ -71,13 +71,15 @@ export class SaveRegistrationFormValue {
         }
         let items: any = {
             [ListFieldsStudentRegistration.Courses + "Id"]: {
-                results: selectedCourse
+                results: [formValues.selectedBatch.key]
             },
             [ListFieldsStudentRegistration.TotalFees]: Math.ceil(totFees),
             [ListFieldsStudentRegistration.CourseDuration]: courseDuration,
             "CourseDurationInMonths":formValues.courseDuration,
-            "CourseCategories":formValues.selectedCourseCategories.join(','),
-            "Discount":formValues.courseDiscount,
+            "CourseCategories":formValues.selectedCourseCategories.text,
+            "Discount":formValues.courseDiscount==null?0:formValues.courseDiscount,
+            [ListFieldsStudentRegistration.BatchName + "Id"]:formValues.selectedBatch.key,
+            [ListFieldsStudentRegistration.BatchMonth]:formValues.selectedMonth.text,
         }
         const saveCourseResult = await this.spListService.UpdateListItemByID(itemId, items, ListNames.StudentRegistrations);
         return saveCourseResult;

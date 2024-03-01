@@ -40,7 +40,10 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
         registrationConfirmModal: false,
         modeOfPaymentsOptions: [],
         isLoading:true,
-        spStudentId:0
+        spStudentId:0,
+        batchOption:[],
+        monthOption:[],
+
       }
     this._listService = new ListOperationService();
     this.paymentDetailRef = React.createRef<FeesTransactions>();
@@ -49,32 +52,41 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
   public componentDidMount = async () => {
     let spParamId = this.getURLParameter('stuid');
 
-    let getCoursesDetails: any[] = await this._listService.GetAllItemsFromList(ListNames.CoursesMaster, "", ["ID", "Id", ListFieldsCoursesMaster.Courses, ListFieldsCoursesMaster.Category], []);
-
+    let getCoursesDetails: any[] = await this._listService.GetAllItemsFromList(ListNames.CoursesMaster, "", ["ID", "Id", ListFieldsCoursesMaster.Batch, ListFieldsCoursesMaster.Category], []);
+    console.log(getCoursesDetails);
+    
     let getGenderFieldItems: any = await this._listService.GetListField(ListNames.StudentRegistrations, ListFieldsStudentRegistration.Gender);
     //console.log(getGenderFieldItems);
     let spCourseCatItems: any = await this._listService.GetListField(ListNames.CoursesMaster, ListFieldsCoursesMaster.Category);
 
     let spModeOfPayments: any = await this._listService.GetListField("StudentTransactions", "ModeOfPayment");
 
+    //let spCoursebatchItems :any = await this.spListService.GetChoiceOptions(ListNames.CoursesMaster,ListFieldsCoursesMaster.Batch);
+
+    let spCourseMonItems :any = await this.spListService.GetChoiceOptions(ListNames.CoursesMaster,ListFieldsCoursesMaster.Month);
+     console.log(spCourseMonItems);
+      
+  
     if(spParamId!=null)
     {
-      this.getStudentData(spParamId)
+      void this.getStudentData(spParamId)
     }
 
     this.setState({
-      coursesOption: getCoursesDetails.map(item => ({ key: item["Id"], text: item["Title"] })),
+      batchOption: getCoursesDetails.map(item => ({ key: item["Id"], text: item["Title"] })),
       genderOption: getGenderFieldItems.Choices.results.map((it: any) => ({ key: it, text: it })),
       courseCategoryOption: spCourseCatItems.Choices.results.map((it: any) => ({ key: it, text: it })),
       modeOfPaymentsOptions: spModeOfPayments.Choices.results.map((it: any) => ({ key: it, text: it })),
       spStudentId:spParamId!=null?parseInt(spParamId):0,
-      isLoading:spParamId!=null?true:false
+      isLoading:spParamId!=null?true:false,
+     // batchOption: spCoursebatchItems.map((it: any) => ({ key: it, text: it })),
+      monthOption: spCourseMonItems[0].Choices.results.map((it: any) => ({ key: it, text: it })),
     })
   }
 
   getStudentData = async (spParamId:string) =>
   {
-      let spStuRegData = await this.spListService.GetListItems("StudentRegistrations","*,Courses/Title",`Id eq ${parseInt(spParamId)}`,"Courses");
+      let spStuRegData = await this.spListService.GetListItems("StudentRegistrations","*,Courses/Title,BatchName/Title",`Id eq ${parseInt(spParamId)}`,"Courses,BatchName");
       if(spStuRegData.length)
       {
         let spBasicInfo = new BasicInfoFormValues();
@@ -94,11 +106,14 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
         spBasicInfo.TelegramGroup = spStuRegData["TelegramGroup"];
         spBasicInfo.spStudentId = spStuRegData["ID"];
         spBasicInfo.feesStatus = spStuRegData["FeesStatus"];
-  
+      
         let spCourseInfo = new CourseInfoFormValues();
         spCourseInfo.courseDuration = spStuRegData["CourseDurationInMonths"];
         spCourseInfo.totalFees = spStuRegData["TotalFees"];
         spCourseInfo.courseDiscount = spStuRegData["Discount"];
+        spCourseInfo.selectedMonth = {key:spStuRegData["BatchMonth"],text:spStuRegData["BatchMonth"]};
+        spCourseInfo.selectedCourseCategories = {key:spStuRegData["CourseCategories"],text:spStuRegData["CourseCategories"]};
+        spCourseInfo.selectedBatch = {key:spStuRegData["BatchNameId"],text:spStuRegData["BatchName"]["Title"]};
 
         let courseCat:any = [];
         let selectedCourseIds = "";
@@ -115,11 +130,13 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
         if(selectedCourseIds!='')
         {
           let spCategoryCourses = await this.spListService.GetListItems("CoursesMaster", "*", selectedCourseIds).catch(err => { console.log(err) });
-
+          console.log(spCategoryCourses);
+          
           spCategoryCourses.forEach((cItem:any) => {
             cItem["IsSelectedCourse"] = true
             spCourseInfo.spSelectedCourseItems.push(cItem);
             courseCat.push(...cItem["Category"]["results"])
+
           });
           
           courseCat = courseCat.filter(function(item:any, pos:any) {
@@ -130,7 +147,7 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
 
         }
         
-        spCourseInfo.selectedCourseCategories = courseCat;
+        
 
         let spEmiInfo =  new EMIInfoFormValues();
         spEmiInfo.feesPaid = spStuRegData["FeesPaid"];
@@ -214,7 +231,7 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
   }
 
   updateCourseInfoCtx = (data:any) =>
-  {
+  { 
     this.setState({
       courseInfoData:{...data}
     })
@@ -264,7 +281,10 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
                       courseCategoryOption={this.state.courseCategoryOption}
                       context={this.props.context}
                       spStudentId={this.state.spStudentId}
+                      StudentId={this.state.basicInfoData.StudentId}
                       isFirstPaymentDone={this.state.emiInfoData.isInitialAmountPaymentDone}
+                      batchOption={this.state.batchOption}
+                      monthOption={this.state.monthOption}
                     />
                   </CourseInfoCtx.Provider>
                 ),
@@ -339,9 +359,9 @@ export default class StudentRegistration extends React.Component<IStudentRegistr
 
   getURLParameter = (searchParam:string) =>
   {
-    var url_string = window.location.href; 
-    var url = new URL(url_string);
-    var c = url.searchParams.get(searchParam);
+    let url_string = window.location.href; 
+    let url = new URL(url_string);
+    let c = url.searchParams.get(searchParam);
     return c;
   }
   

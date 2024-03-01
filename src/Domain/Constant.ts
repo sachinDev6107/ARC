@@ -24,6 +24,8 @@ export class ListFieldsStudentRegistration{
     public static readonly RemainingFees:string="RemainingFees";
     public static readonly TotalFees:string="TotalFees";
     public static readonly CourseDuration:string="CourseDuration";
+    public static readonly BatchName:string="BatchName";
+    public static readonly BatchMonth:string="BatchMonth";
 }
 export class ListFieldsStudentTransactions{
     public static readonly StudentId:string="StudentId";
@@ -56,6 +58,7 @@ export class IlistFieldsEMIMaster{
 
 
 export class ListFieldsCoursesMaster{
-    public static readonly Courses:string="Title";
+    public static readonly Batch:string="Title";
     public static readonly Category:string="Category";
+    public static readonly Month:string="Month";
 }
