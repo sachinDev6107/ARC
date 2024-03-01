@@ -8,8 +8,9 @@ import {
   PrimaryButton,
   IconButton,
   Label,
+  Link,
 } from 'office-ui-fabric-react';
-import Moment from 'react-moment';
+//import Moment from 'react-moment';
 import { Card, Col, Row } from "react-bootstrap";
 import './index.scss'
 import SPListService from "../../../../Services/SPListService";
@@ -65,7 +66,7 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
     const { transactionsData } = this.state;
     transactionsData.push({
       paidAmount: 0,
-      paymentDate: moment(new Date()).format('MM/DD/YYYY'),
+      paymentDate: moment(new Date()).format('DD-MM-YYYY'),
       paymentReceiptNo: '',
       transactionNo: '',
       modeOfPayment: '',
@@ -316,6 +317,14 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
   
     return (
       <>
+        <Col xs={12} md={12}>
+        <Label className="mt-1 mb-2 ml-2">
+              Student Id :{" "}
+              <span className="clsStdId">
+                {this.props.basicInfoData.StudentId}
+              </span>
+            </Label>
+          </Col>
         <Row className="mt-3">
           <Col className="xs={12} md={3}">
               <Label>Total Fees:</Label>
@@ -392,7 +401,7 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
                         />
                       </td>
                       <td>
-                        <Moment format='DD-MM-YYYY'>{new Date()}</Moment>
+                        <label area-disabled={transaction.spPaymentId>0?true:false}>{transaction.paymentDate}</label>
                       </td>
                       <td>
                         <TextField
@@ -444,7 +453,9 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
                           transaction.uploadedPaymentDocuments.map(uploadedFiles=>{
                             return (
                               <div>
-                                <span>{uploadedFiles.fileName}</span>
+                                <div style={{"overflowWrap":"anywhere"}}>
+                                <Link href={this.props.context.pageContext.web.absoluteUrl.slice(0,38) + uploadedFiles.fileUrl}>{uploadedFiles.fileName}</Link>
+                                </div>
                                 <IconButton 
                                   disabled={transaction.spPaymentId>0?true:false} 
                                   iconProps={{ iconName: 'Cancel' }} title="Delete" ariaLabel="Delete" 

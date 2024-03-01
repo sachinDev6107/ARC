@@ -41,7 +41,7 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
     private textChangeHandler = (event: any) => {
         const Value = event.target.value;
         const id = event.target.id;
-        let textFormValues = { ...this.state.formValues }
+        const textFormValues = { ...this.state.formValues }
     
         switch (id) {
           case "stId":
@@ -79,16 +79,17 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
       }
 
       private DateofBirthChange = (date: Date) => {
-        let formValueDOB = { ...this.state.formValues }
+        const formValueDOB = { ...this.state.formValues }
         formValueDOB.DateOfBirth = date;
         this.setState({ formValues: formValueDOB })
       }
 
-      private _dropdownChange = (event: React.FormEvent<HTMLDivElement>, option: IDropdownOption, index?: number) => {
+      // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+      private _dropdownChange = (event: React.FormEvent<HTMLDivElement>, option: IDropdownOption) => {
         const value = option.text;
-        var target = event.target as Element
+        const target = event.target as Element
         const id = target.id
-        let dropDownFormValues = { ...this.state.formValues }
+        const dropDownFormValues = { ...this.state.formValues }
         switch (id) {
           case "ddlgenderSelect":
             dropDownFormValues.Gender = value.toString();
@@ -97,14 +98,16 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
         this.setState({ formValues: dropDownFormValues });
       }
 
+      // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
       saveBasicInfoData = async () =>
       {
         if(this._isValid())
         {
+            // eslint-disable-next-line eqeqeq
             if(this.state.formValues.spStudentId==0)
             {
-                let autoStuId = this.generateStudentId();
-                let regResponse = await this.saveRegistrationObj.saveBasicInfo(this.state.formValues,autoStuId);
+                const autoStuId = this.generateStudentId();
+                const regResponse = await this.saveRegistrationObj.saveBasicInfo(this.state.formValues,autoStuId);
                 this.setState({
                     formValues:{...this.state.formValues,spStudentId:regResponse.data.ID,StudentId:autoStuId},
                     notFormValid:false
@@ -127,20 +130,22 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
         
       }
 
+     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
      generateStudentId = () => {
-        let uniNum = ((new Date().getTime()) / 10000000).toString().substring(8, 14);
-        let stEmail = this.state.formValues.EmailId.split("@")[0];
-        let studentId = stEmail + "_" + uniNum
+        const uniNum = ((new Date().getTime()) / 10000000).toString().substring(8, 14);
+        const stEmail = this.state.formValues.EmailId.split("@")[0];
+        const studentId = stEmail + "_" + uniNum
         return studentId
      }
 
+      // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
       private _isValid = () =>
       {
             if(this.validationSerive.isTextFieldEmpty(this.state.formValues.FirstName) ||
-            this.validationSerive.isTextFieldEmpty(this.state.formValues.LastName) ||
-            this.validationSerive.isRichTextFieldEmpty(this.state.formValues.Address) ||
-            this.validationSerive.isTextFieldEmpty(this.state.formValues.Pincode) ||
-            this.validationSerive.isSelectDropdownEmpty(this.state.formValues.Gender) ||
+            //this.validationSerive.isTextFieldEmpty(this.state.formValues.LastName) ||
+           // this.validationSerive.isRichTextFieldEmpty(this.state.formValues.Address) ||
+           // this.validationSerive.isTextFieldEmpty(this.state.formValues.Pincode) ||
+          //  this.validationSerive.isSelectDropdownEmpty(this.state.formValues.Gender) ||
             this.validationSerive.isTextFieldEmpty(this.state.formValues.Contact) ||
             this.validationSerive.isPhoneNumberValid(this.state.formValues.Contact)||
             this.validationSerive.isTextFieldEmpty(this.state.formValues.EmailId) ||
@@ -157,6 +162,7 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
       }
 
 
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     render() {
         return (
             <>
@@ -191,11 +197,11 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
                                 
                             </Col>
                             <Col xs={12} md={6}>
-                                <Label required>Last Name</Label>
+                                <Label>Last Name</Label>
                                 {
                                     !this.state.formValues.spStudentId && 
                                     <TextField id="inputlName" value={this.state.formValues.LastName} onChange={this.textChangeHandler} 
-                                    errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.LastName)?'Last name is required':""}
+                                   // errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.LastName)?'Last name is required':""}
                                     />
                                 }
                                 {this.state.formValues.spStudentId?this.state.formValues.LastName:""}
@@ -211,15 +217,16 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
                                         value={this.state.formValues.DateOfBirth}
                                         onSelectDate={this.DateofBirthChange}
                                         allowTextInput={true}
+                                        // eslint-disable-next-line @typescript-eslint/no-use-before-define
                                         formatDate={formatDate}
+                                        // eslint-disable-next-line @typescript-eslint/no-use-before-define
                                         strings={DayPickerStrings}
-                                    >
-                                    </DatePicker>
+                                     />
                                 }
                                 {this.state.formValues.spStudentId?moment(this.state.formValues.DateOfBirth).format("dd-mm-yyyy"):""}
                             </Col>
                             <Col xs={12} md={6}>
-                                <Label required>Gender</Label>
+                                <Label>Gender</Label>
                                 {
                                     !this.state.formValues.spStudentId && 
                                     <Dropdown
@@ -228,9 +235,8 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
                                         options={this.props.genderOptions}
                                         selectedKey={this.state.formValues.Gender}
                                         onChange={this._dropdownChange}
-                                        errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.Gender)?'Gender is required':""}
-                                        >
-                                    </Dropdown>
+                                       // errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.Gender)?'Gender is required':""}
+                                         />
                                 }
                                 {this.state.formValues.spStudentId?this.state.formValues.Gender:""}
                             </Col>
@@ -267,17 +273,17 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
                                 />
                             </Col>
                             <Col xs={12} md={6}>
-                                <Label required>Pincode</Label>
+                                <Label>Pincode</Label>
                                 <TextField type="number" id="inputPin" 
                                 onChange={this.textChangeHandler} value={this.state.formValues.Pincode}
-                                errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.Pincode)?'Pincode is required':""}
+                               // errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.Pincode)?'Pincode is required':""}
                                 />
                             </Col>
                             <Col xs={12} md={6}>
-                                <Label required>Address</Label>
+                                <Label>Address</Label>
                                 <TextField multiline rows={3} id="inputAddress" placeholder="Address" 
                                 value={this.state.formValues.Address} onChange={this.textChangeHandler} 
-                                errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.Address)?'Address is required':""}
+                               // errorMessage={this.state.notFormValid && this.validationSerive.isTextFieldEmpty(this.state.formValues.Address)?'Address is required':""}
                                 />
                             </Col>
                            
