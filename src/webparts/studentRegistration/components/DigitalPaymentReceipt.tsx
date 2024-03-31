@@ -8,8 +8,12 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import * as moment from "moment";
 import autoTable from "jspdf-autotable";
+import { SaveRegistrationFormValue } from "./Save";
+import { WebPartContext } from "@microsoft/sp-webpart-base";
+import { Col, Container, Row } from "react-bootstrap";
 
 interface IDigitalPaymentReceiptProps {
+  context: WebPartContext;
   courseInfo: CourseInfoFormValues;
   emiInfoData: EMIInfoFormValues;
   basicInfoData: BasicInfoFormValues;
@@ -21,6 +25,10 @@ export class DigitalPaymentReceipt extends React.Component<
   IDigitalPaymentReceiptProps,
   any
 > {
+  saveRegistrationObj: SaveRegistrationFormValue =
+    new SaveRegistrationFormValue(
+      this.props.context.pageContext.web.absoluteUrl
+    );
   constructor(props: IDigitalPaymentReceiptProps) {
     super(props);
   }
@@ -225,6 +233,16 @@ export class DigitalPaymentReceipt extends React.Component<
 
     return doc;
   }
+  sendDigitalReceipt = async () => {
+    const saveDigitalReceipt =
+      await this.saveRegistrationObj.sendDigitalReceipt(
+        this.props.basicInfoData
+      );
+    this.setState({
+      receiptResponseId: saveDigitalReceipt.data.Id,
+    });
+  };
+
   render() {
     return (
       <>
@@ -232,11 +250,23 @@ export class DigitalPaymentReceipt extends React.Component<
           Student Id :{" "}
           <span className="clsStdId">{this.props.basicInfoData.StudentId}</span>
         </Label>
-        <PrimaryButton
-          iconProps={{ iconName: "Download" }}
-          text="Generate Digital Receipts"
-          onClick={this.generateReceipts}
-        ></PrimaryButton>
+        <Container>
+          <Row>
+            <Col xs={12} md={6}>
+              <PrimaryButton
+                iconProps={{ iconName: "Download" }}
+                text="Generate Digital Receipts"
+                onClick={this.generateReceipts}
+              ></PrimaryButton>
+            </Col>
+            <Col xs={12} md={6}>
+              <PrimaryButton
+                text="Send Digital Receipts"
+                onClick={this.sendDigitalReceipt}
+              ></PrimaryButton>
+            </Col>
+          </Row>
+        </Container>
       </>
     );
   }

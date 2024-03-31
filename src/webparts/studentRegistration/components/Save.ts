@@ -1,6 +1,6 @@
 
 import * as moment from "moment";
-import { IlistFieldsEMIMaster, ListFieldsStudentRegistration, ListFieldsStudentTransactions, ListNames } from "../../../Domain/Constant";
+import { IlistFieldsEMIMaster, ListFieldsSendReceiptEmailEntry, ListFieldsStudentRegistration, ListFieldsStudentTransactions, ListNames } from "../../../Domain/Constant";
 import SPListService from "../../../Services/SPListService";
 import { BasicInfoValues } from "./IStudentRegistrationState";
 import { BasicInfoFormValues } from "./BasicInfo/IBasicInfo";
@@ -145,5 +145,13 @@ export class SaveRegistrationFormValue {
         })
         let savePaymentInfoResult = await this.spListService.CreateListItems(ListNames.StudentTransactions, paymentDetailsValues!);
         return savePaymentInfoResult;
+    }
+    public async sendDigitalReceipt(basicInfoData:any){
+       let item :any = {
+        [ListFieldsSendReceiptEmailEntry.StudentId]:basicInfoData.StudentId,
+        [ListFieldsSendReceiptEmailEntry.StudentEmail]:basicInfoData.EmailId
+       }
+       let saveDigitalReceiptInfo = await this.spListService.CreateListItem(ListNames.SendReceiptEmailEntry,item);
+       return saveDigitalReceiptInfo;
     }
 }
