@@ -3,6 +3,7 @@ export class ListNames{
     public static readonly CoursesMaster:string="CoursesMaster";
     public static readonly StudentTransactions:string="StudentTransactions";
     public static readonly EMIMaster:string="EMIMaster";
+    public static readonly SendReceiptEmailEntry:string='SendReceiptEmailEntry';
 }
 
 export class ListFieldsStudentRegistration{
@@ -61,4 +62,9 @@ export class ListFieldsCoursesMaster{
     public static readonly Batch:string="Title";
     public static readonly Category:string="Category";
     public static readonly Month:string="Month";
+}
+
+export class ListFieldsSendReceiptEmailEntry{
+    public static readonly StudentId:string="Title";
+    public static readonly StudentEmail:string="Email";
 }

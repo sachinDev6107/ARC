@@ -38,8 +38,8 @@ class FinalValidation extends React.Component<IFinalValidationdProps, IFinalVali
                     emiInfoData={this.props.emiInfoData}
                     basicInfoData={this.props.basicInfoData}
                     transactionInfoData={this.props.transactionInfoData}
-                    siteUrl={this.props.context.pageContext.web.absoluteUrl}
-              ></DigitalPaymentReceipt>  
+                    siteUrl={this.props.context.pageContext.web.absoluteUrl} 
+                    context={this.props.context}></DigitalPaymentReceipt>  
             </>
         );
     }
