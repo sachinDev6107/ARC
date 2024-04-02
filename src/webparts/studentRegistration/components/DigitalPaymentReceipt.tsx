@@ -11,6 +11,7 @@ import autoTable from "jspdf-autotable";
 import { SaveRegistrationFormValue } from "./Save";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { Col, Container, Row } from "react-bootstrap";
+import SPListService from "../../../Services/SPListService";
 
 interface IDigitalPaymentReceiptProps {
   context: WebPartContext;
@@ -21,20 +22,19 @@ interface IDigitalPaymentReceiptProps {
   siteUrl: string;
 }
 
-export class DigitalPaymentReceipt extends React.Component<
-  IDigitalPaymentReceiptProps,
-  any
-> {
-  saveRegistrationObj: SaveRegistrationFormValue =
-    new SaveRegistrationFormValue(
-      this.props.context.pageContext.web.absoluteUrl
-    );
+export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceiptProps,any> {
+  saveRegistrationObj: SaveRegistrationFormValue;
+  spListService: SPListService;
+  static digiProps:any;
   constructor(props: IDigitalPaymentReceiptProps) {
     super(props);
+    DigitalPaymentReceipt.digiProps=props;
+    this.saveRegistrationObj = new SaveRegistrationFormValue(this.props.context.pageContext.web.absoluteUrl);
+    this.spListService = new SPListService(this.props.context.pageContext.web.absoluteUrl);
   }
 
-  generateReceipts = () => {
-    var printDoc = new jsPDF("p", "pt");
+  generateReceipts = (receiptType?: string) => {
+    var printDoc = new jsPDF("p", "pt", "a4",true);
 
     const pageWidth = printDoc.internal.pageSize.getWidth();
     const pageHeight = printDoc.internal.pageSize.getHeight();
@@ -42,7 +42,7 @@ export class DigitalPaymentReceipt extends React.Component<
     const img = new Image();
     const imgWidth = pageWidth;
     //const imgHeight = (img.height * pageWidth) / img.width;
-    img.src = this.props.siteUrl + "/SiteAssets/Letter%20Head.png";
+    img.src = DigitalPaymentReceipt.digiProps.siteUrl + "/SiteAssets/Letter%20Head.png";
     printDoc.addImage(img, "PNG", 0, 0, imgWidth, pageHeight);
 
     let todaydateValue: Date = new Date();
@@ -55,22 +55,24 @@ export class DigitalPaymentReceipt extends React.Component<
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
     printDoc.text("Invoice No:", 10, 190).setFont("", "bold");
     printDoc.setFontSize(11).setFont(printDoc.getFont().fontName, "normal");
-    printDoc.text(this.props.transactionInfoData[0].paymentReceiptNo, 10, 205);
+    printDoc.text(DigitalPaymentReceipt.digiProps.transactionInfoData[0].paymentReceiptNo, 10, 205);
 
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
     printDoc.text("Billed To:", 400, 200);
     printDoc.setFontSize(11).setFont(printDoc.getFont().fontName, "normal");
     printDoc.text(
-      this.props.basicInfoData.FirstName +
+      DigitalPaymentReceipt.digiProps.basicInfoData.FirstName +
         " " +
-        this.props.basicInfoData.LastName,
+        DigitalPaymentReceipt.digiProps.basicInfoData.LastName,
       400,
       215
     );
-    printDoc.text(this.props.basicInfoData.Contact, 400, 230);
-    printDoc.text(this.props.basicInfoData.Address, 400, 245, {
-      maxWidth: 180,
-    });
+    printDoc.text(DigitalPaymentReceipt.digiProps.basicInfoData.Contact, 400, 230);
+    if(DigitalPaymentReceipt.digiProps.basicInfoData.Address!=null){
+      printDoc.text(DigitalPaymentReceipt.digiProps.basicInfoData.Address, 400, 245, {
+        maxWidth: 180,
+      })
+    }
 
     const transactionColumns = [
       "Sr. No",
@@ -92,7 +94,7 @@ export class DigitalPaymentReceipt extends React.Component<
       "",
       "",
       "Total Fees Paid:",
-      this.props.emiInfoData.feesPaid,
+      DigitalPaymentReceipt.digiProps.emiInfoData.feesPaid,
     ];
     const footerData2 = [
       "",
@@ -100,7 +102,7 @@ export class DigitalPaymentReceipt extends React.Component<
       "",
       "",
       "Total Course Fees:",
-      this.props.courseInfo.totalFees,
+      DigitalPaymentReceipt.digiProps.courseInfo.totalFees,
     ];
     const footerData3 = [
       "",
@@ -108,15 +110,15 @@ export class DigitalPaymentReceipt extends React.Component<
       "",
       "",
       "Remaining Fees:",
-      this.props.emiInfoData.totalRemainingAmount,
+      DigitalPaymentReceipt.digiProps.emiInfoData.totalRemainingAmount,
     ];
     let footerData: any = [footerData1, footerData2, footerData3];
 
-    this.props.transactionInfoData.sort(
+    DigitalPaymentReceipt.digiProps.transactionInfoData.sort(
       (a: any, b: any) => a.paymentDate - b.paymentDate
     );
 
-    this.props.transactionInfoData.forEach((item, index) => {
+    DigitalPaymentReceipt.digiProps.transactionInfoData.forEach((item:any, index:any) => {
       let tRowData = [];
       tRowData.push(index + 1);
       tRowData.push(item.paymentDate);
@@ -170,7 +172,7 @@ export class DigitalPaymentReceipt extends React.Component<
     const ey = 300 + transactionData.length * 10 + footerData.length * 10 + 150;
     const ecolumnWidths = [50, 100, 80, 100, 100, 100, 80];
     let emiTblData: any = [];
-    this.props.emiInfoData.emiData.forEach((emiItem: any) => {
+    DigitalPaymentReceipt.digiProps.emiInfoData.emiData.forEach((emiItem: any) => {
       let emiRow = [];
       emiRow.push(emiItem.srNo);
       emiRow.push(emiItem.nextEmiDate);
@@ -204,11 +206,19 @@ export class DigitalPaymentReceipt extends React.Component<
     });
 
     printDoc = this.addWaterMark(printDoc);
-    printDoc.save(
-      `${this.props.basicInfoData.StudentId}_FeesReceipt_${moment(
-        todaydateValue
-      ).format("DDMMMyyyy")}".pdf`
-    );
+    let fileName = `${DigitalPaymentReceipt.digiProps.basicInfoData.StudentId}_FeesReceipt_${moment(todaydateValue).format("DDMMMyyyy")}.pdf`;
+    if(receiptType=="sendonly")
+    {
+      let printDocBlob = printDoc.output("blob");
+      this.sendDigitalReceipt(printDocBlob,fileName);
+    }
+    else
+    {
+      printDoc.save(fileName);
+    }
+    
+
+    
   };
 
   public addWaterMark(doc: any) {
@@ -233,14 +243,11 @@ export class DigitalPaymentReceipt extends React.Component<
 
     return doc;
   }
-  sendDigitalReceipt = async () => {
-    const saveDigitalReceipt =
-      await this.saveRegistrationObj.sendDigitalReceipt(
-        this.props.basicInfoData
-      );
-    this.setState({
-      receiptResponseId: saveDigitalReceipt.data.Id,
-    });
+  sendDigitalReceipt = async (printDocBlob:any,fileName:string) => {
+    const saveDigitalReceipt = await this.saveRegistrationObj.sendDigitalReceipt(DigitalPaymentReceipt.digiProps.basicInfoData);
+    
+    this.spListService.saveListAttachment(fileName,printDocBlob,'SendReceiptEmailEntry',saveDigitalReceipt.data.Id);
+
   };
 
   render() {
@@ -248,7 +255,7 @@ export class DigitalPaymentReceipt extends React.Component<
       <>
         <Label className="mt-1 mb-2 ms-3">
           Student Id :{" "}
-          <span className="clsStdId">{this.props.basicInfoData.StudentId}</span>
+          <span className="clsStdId">{DigitalPaymentReceipt.digiProps.basicInfoData.StudentId}</span>
         </Label>
         <Container>
           <Row>
@@ -256,13 +263,13 @@ export class DigitalPaymentReceipt extends React.Component<
               <PrimaryButton
                 iconProps={{ iconName: "Download" }}
                 text="Generate Digital Receipts"
-                onClick={this.generateReceipts}
+                onClick={()=>{this.generateReceipts()}}
               ></PrimaryButton>
             </Col>
             <Col xs={12} md={6}>
               <PrimaryButton
                 text="Send Digital Receipts"
-                onClick={this.sendDigitalReceipt}
+                onClick={()=>{this.generateReceipts("sendonly")}}
               ></PrimaryButton>
             </Col>
           </Row>

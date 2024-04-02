@@ -19,6 +19,7 @@ import { ListFieldsStudentTransactions } from "../../../../Domain/Constant";
 import * as moment from "moment";
 import { IFeesTransactionsProps, IFeesTransactionsState, ITransactionData } from "./ITransactionsInfo";
 import { BasicInfoCtx } from "../ComponentContext/Contexts";
+import { DigitalPaymentReceipt } from "../DigitalPaymentReceipt";
 
 class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTransactionsState> {
   spListService = new SPListService(this.props.context.pageContext.web.absoluteUrl);
@@ -269,6 +270,16 @@ class FeesTransactions extends React.Component<IFeesTransactionsProps, IFeesTran
           })
         }
         this.props.updateTransactionInfoCtx(this.state.transactionsData)
+        let dpr = new DigitalPaymentReceipt({
+            courseInfo:this.props.courseInfo,
+            emiInfoData:this.props.emiInfoData,
+            basicInfoData:this.props.basicInfoData,
+            transactionInfoData:this.props.transactionInfoData,
+            siteUrl:this.props.context.pageContext.web.absoluteUrl,
+            context:this.props.context
+        });
+        dpr.generateReceipts("onlysend");
+        
         // Show success message
         //this.setState({ showSuccessMessage: true});
       }

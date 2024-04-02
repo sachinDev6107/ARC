@@ -457,4 +457,9 @@ export default class SPListService {
         }
         return returnItems;
     }
+
+    public async saveListAttachment(filename:string,content:any,listName:string,listItemId:number):Promise<any>{
+        let file = await sp.web.lists.getByTitle(listName).items.getById(listItemId).attachmentFiles.add(filename, content);
+        return file;
+    }
 }
