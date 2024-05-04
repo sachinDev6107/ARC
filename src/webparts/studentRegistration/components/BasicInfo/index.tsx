@@ -263,7 +263,7 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
                                     this.state.notFormValid && this.validationSerive.isEmailValid(this.state.formValues.EmailId)? "Please Enter Valid Email Id":""}
                                     />
                                 }
-                                {this.state.formValues.spStudentId?this.state.formValues.Contact:""}
+                                {this.state.formValues.spStudentId?this.state.formValues.EmailId:""}
                             </Col>
                             <Col xs={12} md={6}>
                                 <Label>Telegram Group</Label>
