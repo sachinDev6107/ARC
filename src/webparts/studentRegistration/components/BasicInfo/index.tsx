@@ -223,7 +223,7 @@ class BasicInfo extends React.Component<IBasicInfoProps, IBasicInfoState> {
                                         strings={DayPickerStrings}
                                      />
                                 }
-                                {this.state.formValues.spStudentId?moment(this.state.formValues.DateOfBirth).format("dd-mm-yyyy"):""}
+                                {this.state.formValues.spStudentId?moment(this.state.formValues.DateOfBirth).format("DD-MM-YYYY"):""}
                             </Col>
                             <Col xs={12} md={6}>
                                 <Label>Gender</Label>

@@ -34,7 +34,7 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
   }
 
   generateReceipts = (receiptType?: string) => {
-    var printDoc = new jsPDF("p", "pt", "a4",true);
+    var printDoc = new jsPDF("p", "pt","a4",false)
 
     const pageWidth = printDoc.internal.pageSize.getWidth();
     const pageHeight = printDoc.internal.pageSize.getHeight();
@@ -42,8 +42,7 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
     const img = new Image();
     const imgWidth = pageWidth;
     //const imgHeight = (img.height * pageWidth) / img.width;
-    img.src = DigitalPaymentReceipt.digiProps.siteUrl + "/SiteAssets/Letter%20Head.png";
-    printDoc.addImage(img, "PNG", 0, 0, imgWidth, pageHeight);
+    printDoc.addImage(img, "PNG", 0, 0, imgWidth, pageHeight, undefined, "FAST");
 
     let todaydateValue: Date = new Date();
     let todaydateString: string = moment(todaydateValue).format("DD-MMM-yyyy");
