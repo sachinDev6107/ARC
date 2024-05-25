@@ -42,6 +42,7 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
     const img = new Image();
     const imgWidth = pageWidth;
     //const imgHeight = (img.height * pageWidth) / img.width;
+    img.src = DigitalPaymentReceipt.digiProps.siteUrl + "/SiteAssets/Letter%20Head.png";
     printDoc.addImage(img, "PNG", 0, 0, imgWidth, pageHeight, undefined, "FAST");
 
     let todaydateValue: Date = new Date();
