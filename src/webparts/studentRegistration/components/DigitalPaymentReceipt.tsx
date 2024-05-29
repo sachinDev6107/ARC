@@ -22,19 +22,26 @@ interface IDigitalPaymentReceiptProps {
   siteUrl: string;
 }
 
-export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceiptProps,any> {
+export class DigitalPaymentReceipt extends React.Component<
+  IDigitalPaymentReceiptProps,
+  any
+> {
   saveRegistrationObj: SaveRegistrationFormValue;
   spListService: SPListService;
-  static digiProps:any;
+  static digiProps: any;
   constructor(props: IDigitalPaymentReceiptProps) {
     super(props);
-    DigitalPaymentReceipt.digiProps=props;
-    this.saveRegistrationObj = new SaveRegistrationFormValue(this.props.context.pageContext.web.absoluteUrl);
-    this.spListService = new SPListService(this.props.context.pageContext.web.absoluteUrl);
+    DigitalPaymentReceipt.digiProps = props;
+    this.saveRegistrationObj = new SaveRegistrationFormValue(
+      this.props.context.pageContext.web.absoluteUrl
+    );
+    this.spListService = new SPListService(
+      this.props.context.pageContext.web.absoluteUrl
+    );
   }
 
   generateReceipts = (receiptType?: string) => {
-    var printDoc = new jsPDF("p", "pt", "a4",true);
+    var printDoc = new jsPDF("p", "pt", "a4", true);
 
     const pageWidth = printDoc.internal.pageSize.getWidth();
     const pageHeight = printDoc.internal.pageSize.getHeight();
@@ -42,20 +49,29 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
     const img = new Image();
     const imgWidth = pageWidth;
     //const imgHeight = (img.height * pageWidth) / img.width;
-    img.src = DigitalPaymentReceipt.digiProps.siteUrl + "/SiteAssets/Letter%20Head.png";
+    img.src =
+      DigitalPaymentReceipt.digiProps.siteUrl + "/SiteAssets/Letter%20Head.png";
     printDoc.addImage(img, "PNG", 0, 0, imgWidth, pageHeight);
 
     let todaydateValue: Date = new Date();
     let todaydateString: string = moment(todaydateValue).format("DD-MMM-yyyy");
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
-    printDoc.text("Invoice Date: ", 10, 150);
+    // printDoc.text("Invoice Date: ", 10, 150);
+    printDoc.text("Invoice Date: ", 10, 200);
     printDoc.setFontSize(11).setFont(printDoc.getFont().fontName, "normal");
-    printDoc.text(todaydateString, 10, 165);
+    // printDoc.text(todaydateString, 10, 165);
+    printDoc.text(todaydateString, 10, 215);
 
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
-    printDoc.text("Invoice No:", 10, 190).setFont("", "bold");
+    // printDoc.text("Invoice No:", 10, 190).setFont("", "bold");
+    printDoc.text("Invoice No:", 10, 230).setFont("", "bold");
     printDoc.setFontSize(11).setFont(printDoc.getFont().fontName, "normal");
-    printDoc.text(DigitalPaymentReceipt.digiProps.transactionInfoData[0].paymentReceiptNo, 10, 205);
+    // printDoc.text(DigitalPaymentReceipt.digiProps.transactionInfoData[0].paymentReceiptNo, 10, 205);
+    printDoc.text(
+      DigitalPaymentReceipt.digiProps.transactionInfoData[0].paymentReceiptNo,
+      10,
+      245
+    );
 
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
     printDoc.text("Billed To:", 400, 200);
@@ -67,11 +83,20 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
       400,
       215
     );
-    printDoc.text(DigitalPaymentReceipt.digiProps.basicInfoData.Contact, 400, 230);
-    if(DigitalPaymentReceipt.digiProps.basicInfoData.Address!=null){
-      printDoc.text(DigitalPaymentReceipt.digiProps.basicInfoData.Address, 400, 245, {
-        maxWidth: 180,
-      })
+    printDoc.text(
+      DigitalPaymentReceipt.digiProps.basicInfoData.Contact,
+      400,
+      230
+    );
+    if (DigitalPaymentReceipt.digiProps.basicInfoData.Address != null) {
+      printDoc.text(
+        DigitalPaymentReceipt.digiProps.basicInfoData.Address,
+        400,
+        245,
+        {
+          maxWidth: 180,
+        }
+      );
     }
 
     const transactionColumns = [
@@ -118,16 +143,18 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
       (a: any, b: any) => a.paymentDate - b.paymentDate
     );
 
-    DigitalPaymentReceipt.digiProps.transactionInfoData.forEach((item:any, index:any) => {
-      let tRowData = [];
-      tRowData.push(index + 1);
-      tRowData.push(item.paymentDate);
-      tRowData.push(item.paymentReceiptNo);
-      tRowData.push(item.transactionNo);
-      tRowData.push(item.modeOfPayment);
-      tRowData.push(item.paidAmount);
-      transactionData.push(tRowData);
-    });
+    DigitalPaymentReceipt.digiProps.transactionInfoData.forEach(
+      (item: any, index: any) => {
+        let tRowData = [];
+        tRowData.push(index + 1);
+        tRowData.push(item.paymentDate);
+        tRowData.push(item.paymentReceiptNo);
+        tRowData.push(item.transactionNo);
+        tRowData.push(item.modeOfPayment);
+        tRowData.push(item.paidAmount);
+        transactionData.push(tRowData);
+      }
+    );
 
     autoTable(printDoc, {
       head: [transactionColumns],
@@ -172,16 +199,18 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
     const ey = 300 + transactionData.length * 10 + footerData.length * 10 + 150;
     const ecolumnWidths = [50, 100, 80, 100, 100, 100, 80];
     let emiTblData: any = [];
-    DigitalPaymentReceipt.digiProps.emiInfoData.emiData.forEach((emiItem: any) => {
-      let emiRow = [];
-      emiRow.push(emiItem.srNo);
-      emiRow.push(emiItem.nextEmiDate);
-      emiRow.push(Math.ceil(emiItem.emiAmount));
-      emiRow.push(Math.ceil(emiItem.remainingAmount));
-      emiRow.push(Math.ceil(emiItem.totalPaidAmount));
-      emiRow.push(emiItem.isEMIPaid ? "Paid" : "Pending");
-      emiTblData.push(emiRow);
-    });
+    DigitalPaymentReceipt.digiProps.emiInfoData.emiData.forEach(
+      (emiItem: any) => {
+        let emiRow = [];
+        emiRow.push(emiItem.srNo);
+        emiRow.push(emiItem.nextEmiDate);
+        emiRow.push(Math.ceil(emiItem.emiAmount));
+        emiRow.push(Math.ceil(emiItem.remainingAmount));
+        emiRow.push(Math.ceil(emiItem.totalPaidAmount));
+        emiRow.push(emiItem.isEMIPaid ? "Paid" : "Pending");
+        emiTblData.push(emiRow);
+      }
+    );
     autoTable(printDoc, {
       head: [emiColumns],
       body: emiTblData,
@@ -206,19 +235,25 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
     });
 
     printDoc = this.addWaterMark(printDoc);
-    let fileName = `${DigitalPaymentReceipt.digiProps.basicInfoData.StudentId}_FeesReceipt_${moment(todaydateValue).format("DDMMMyyyy")}.pdf`;
-    if(receiptType=="sendonly")
-    {
+    let fileName = `${
+      DigitalPaymentReceipt.digiProps.basicInfoData.StudentId
+    }_FeesReceipt_${moment(todaydateValue).format("DDMMMyyyy")}.pdf`;
+    if (receiptType == "sendonly") {
       let printDocBlob = printDoc.output("blob");
-      this.sendDigitalReceipt(printDocBlob,fileName);
-    }
-    else
-    {
+      this.sendDigitalReceipt(printDocBlob, fileName).then(
+        (onResolved) => {
+          // Some task on success
+          alert("Fees Receipt has been sent");
+        },
+        (onRejected) => {
+          // Some task on failure
+          alert("Fees Receipt has not been sent. Please try again");
+        }
+      );
+      
+    } else {
       printDoc.save(fileName);
     }
-    
-
-    
   };
 
   public addWaterMark(doc: any) {
@@ -233,7 +268,12 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
 
       //doc.text(150, doc.internal.pageSize.height - 500, 'Internal Use Only', 20, 90);
       //doc.text(20, doc.internal.pageSize.height - 10, 'Internal Use Only');
-      doc.text(doc.internal.pageSize.width - 450, 15, "ARC Digital Receipt.");
+      //doc.text(doc.internal.pageSize.width - 450, 15, "ARC Digital Receipt.");
+      doc.text(
+        doc.internal.pageSize.width - 450,
+        15,
+        "Cognitech Digital Receipt."
+      );
       doc.text(
         doc.internal.pageSize.width - 450,
         doc.internal.pageSize.height - 100,
@@ -243,11 +283,18 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
 
     return doc;
   }
-  sendDigitalReceipt = async (printDocBlob:any,fileName:string) => {
-    const saveDigitalReceipt = await this.saveRegistrationObj.sendDigitalReceipt(DigitalPaymentReceipt.digiProps.basicInfoData);
-    
-    this.spListService.saveListAttachment(fileName,printDocBlob,'SendReceiptEmailEntry',saveDigitalReceipt.data.Id);
+  sendDigitalReceipt = async (printDocBlob: any, fileName: string) => {
+    const saveDigitalReceipt =
+      await this.saveRegistrationObj.sendDigitalReceipt(
+        DigitalPaymentReceipt.digiProps.basicInfoData
+      );
 
+    this.spListService.saveListAttachment(
+      fileName,
+      printDocBlob,
+      "SendReceiptEmailEntry",
+      saveDigitalReceipt.data.Id
+    );
   };
 
   render() {
@@ -255,7 +302,9 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
       <>
         <Label className="mt-1 mb-2 ms-3">
           Student Id :{" "}
-          <span className="clsStdId">{DigitalPaymentReceipt.digiProps.basicInfoData.StudentId}</span>
+          <span className="clsStdId">
+            {DigitalPaymentReceipt.digiProps.basicInfoData.StudentId}
+          </span>
         </Label>
         <Container>
           <Row>
@@ -263,13 +312,17 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
               <PrimaryButton
                 iconProps={{ iconName: "Download" }}
                 text="Generate Digital Receipts"
-                onClick={()=>{this.generateReceipts()}}
+                onClick={() => {
+                  this.generateReceipts();
+                }}
               ></PrimaryButton>
             </Col>
             <Col xs={12} md={6}>
               <PrimaryButton
                 text="Send Digital Receipts"
-                onClick={()=>{this.generateReceipts("sendonly")}}
+                onClick={() => {
+                  this.generateReceipts("sendonly");
+                }}
               ></PrimaryButton>
             </Col>
           </Row>
