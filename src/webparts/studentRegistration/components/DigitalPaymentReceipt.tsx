@@ -48,14 +48,19 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
     let todaydateValue: Date = new Date();
     let todaydateString: string = moment(todaydateValue).format("DD-MMM-yyyy");
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
-    printDoc.text("Invoice Date: ", 10, 150);
+    printDoc.text("Invoice Date: ", 15, 160);
     printDoc.setFontSize(11).setFont(printDoc.getFont().fontName, "normal");
-    printDoc.text(todaydateString, 10, 165);
+    printDoc.text(todaydateString, 15, 175);
 
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
-    printDoc.text("Invoice No:", 10, 190).setFont("", "bold");
+    printDoc.text("Invoice No:", 15, 195).setFont("", "bold");
     printDoc.setFontSize(11).setFont(printDoc.getFont().fontName, "normal");
-    printDoc.text(DigitalPaymentReceipt.digiProps.transactionInfoData[0].paymentReceiptNo, 10, 205);
+    printDoc.text(DigitalPaymentReceipt.digiProps.transactionInfoData[0].paymentReceiptNo, 15, 205);
+
+    printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
+    printDoc.text("Batch Name:", 15, 225).setFont("", "bold");
+    printDoc.setFontSize(11).setFont(printDoc.getFont().fontName, "normal");
+    printDoc.text(DigitalPaymentReceipt.digiProps.courseInfo.selectedBatch.text, 15, 235);
 
     printDoc.setFontSize(12).setFont(printDoc.getFont().fontName, "bold");
     printDoc.text("Billed To:", 400, 200);
@@ -210,7 +215,16 @@ export class DigitalPaymentReceipt extends React.Component<IDigitalPaymentReceip
     if(receiptType=="sendonly")
     {
       let printDocBlob = printDoc.output("blob");
-      this.sendDigitalReceipt(printDocBlob,fileName);
+      this.sendDigitalReceipt(printDocBlob,fileName).then(
+        (onResolved) => {
+          // Some task on success
+          alert("Fees Receipt has been sent");
+        },
+        (onRejected) => {
+          // Some task on failure
+          alert("Fees Receipt has not been sent. Please try again");
+        }
+      );;
     }
     else
     {
